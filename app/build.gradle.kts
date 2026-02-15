@@ -50,4 +50,5 @@ dependencies {
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.lifecycle.livedata)
     implementation(libs.lifecycle.viewmodel.compose)
+    implementation("org.osmdroid:osmdroid-android:6.1.20")
 }
