@@ -1,3 +1,3 @@
 # Opti Weather
 
-Pet project for tracking the weather 
+Pet project for tracking the weather from open meteo api
