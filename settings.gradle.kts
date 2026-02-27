@@ -21,4 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "Opti Weather"
 include(":app")
- 
+include(":data")
+include(":domain")

@@ -1,4 +1,4 @@
-package com.example.optiweather
+package com.example.optiweather.presentation
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,7 +10,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.example.optiweather.model.WeatherData
+import com.example.optiweather.R
+import com.example.optiweather.domain.model.CoordinatesData
+import com.example.optiweather.domain.model.WeatherData
 import com.example.optiweather.viewmodel.MainViewModel
 
 class MainActivity : AppCompatActivity() {
@@ -39,9 +41,9 @@ class MainActivity : AppCompatActivity() {
 
         viewModel!!.getWeatherData().observe(this, Observer { weatherData: WeatherData? ->
             progressBar!!.visibility = View.GONE
-            if (weatherData != null && weatherData.currentWeather != null) {
-                val temp = weatherData.currentWeather.temperature
-                val wind = weatherData.currentWeather.windspeed
+            if (weatherData != null) {
+                val temp = weatherData.temperature
+                val wind = weatherData.windSpeed
                 tempTextView!!.text = "$temp °C"
                 windTextView!!.text = "Wind: $wind m/s"
             }
@@ -52,30 +54,30 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this@MainActivity, "Error: $error", Toast.LENGTH_SHORT).show()
         })
 
-        pickLocationButton!!.setOnClickListener(View.OnClickListener { v: View? ->
+        pickLocationButton!!.setOnClickListener { v: View? ->
             val intent = Intent(this@MainActivity, PlacePickerActivity::class.java)
-            intent.putExtra(PlacePickerActivity.EXTRA_LATITUDE, currentLat)
-            intent.putExtra(PlacePickerActivity.EXTRA_LONGITUDE, currentLon)
+            intent.putExtra(PlacePickerActivity.Companion.EXTRA_LATITUDE, currentLat)
+            intent.putExtra(PlacePickerActivity.Companion.EXTRA_LONGITUDE, currentLon)
             startActivityForResult(intent, PLACE_PICKER_REQUEST)
-        })
+        }
 
         updateLocationText()
 
-        loadWeather(currentLat, currentLon)
+        val coordinates = CoordinatesData(currentLat, currentLon)
+        getWeather(coordinates)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PLACE_PICKER_REQUEST) {
             if (resultCode == RESULT_OK && data != null) {
-                val lat = data.getDoubleExtra(PlacePickerActivity.EXTRA_LATITUDE, currentLat)
-                val lon = data.getDoubleExtra(PlacePickerActivity.EXTRA_LONGITUDE, currentLon)
-                currentLat = lat
-                currentLon = lon
+                currentLat = data.getDoubleExtra(PlacePickerActivity.Companion.EXTRA_LATITUDE, currentLat)
+                currentLon = data.getDoubleExtra(PlacePickerActivity.Companion.EXTRA_LONGITUDE, currentLon)
+                val coordinates = CoordinatesData(currentLat, currentLon)
 
                 updateLocationText()
 
-                loadWeather(lat, lon)
+                getWeather(coordinates)
             }
         }
     }
@@ -85,9 +87,9 @@ class MainActivity : AppCompatActivity() {
         selectedLocationTextView!!.text = text
     }
 
-    private fun loadWeather(lat: Double, lon: Double) {
+    private fun getWeather(coordinatesData: CoordinatesData) {
         progressBar!!.visibility = View.VISIBLE
-        viewModel!!.loadWeather(lat, lon)
+        viewModel!!.getWeather(coordinatesData)
     }
 
     companion object {

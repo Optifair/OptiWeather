@@ -1,15 +1,14 @@
-package com.example.optiweather.network
+package com.example.optiweather.data.network
 
-import com.example.optiweather.model.WeatherData
-import retrofit2.Call
+import com.example.optiweather.data.network.model.Weather
 import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface WeatherApi {
     @GET("v1/forecast")
-    fun getCurrentWeather(
+    suspend fun getCurrentWeather(
         @Query("latitude") latitude: Double,
         @Query("longitude") longitude: Double,
         @Query("current_weather") currentWeather: Boolean
-    ): Call<WeatherData?>?
+    ): Weather
 }

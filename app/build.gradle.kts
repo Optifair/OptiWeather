@@ -37,6 +37,9 @@ android {
 
 dependencies {
 
+    implementation(project(":data"))
+    implementation(project(":domain"))
+
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
@@ -50,8 +53,6 @@ dependencies {
     implementation(libs.appcompat.v161)
     implementation(libs.material.v1110)
     implementation(libs.constraintlayout.v214)
-    implementation(libs.retrofit)
-    implementation(libs.converter.gson)
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.lifecycle.livedata)
     implementation(libs.lifecycle.viewmodel.compose)
