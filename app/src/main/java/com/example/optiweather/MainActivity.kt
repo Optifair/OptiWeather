@@ -1,97 +1,96 @@
-package com.example.optiweather;
+package com.example.optiweather
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.content.Intent
+import android.os.Bundle
+import android.view.View
+import android.widget.Button
+import android.widget.ProgressBar
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import com.example.optiweather.model.WeatherData
+import com.example.optiweather.viewmodel.WeatherViewModel
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
+class MainActivity : AppCompatActivity() {
+    private var viewModel: WeatherViewModel? = null
 
-import com.example.optiweather.viewmodel.WeatherViewModel;
+    private var tempTextView: TextView? = null
+    private var windTextView: TextView? = null
+    private var pickLocationButton: Button? = null
+    private var selectedLocationTextView: TextView? = null
+    private var progressBar: ProgressBar? = null
 
-public class MainActivity extends AppCompatActivity {
+    private var currentLat = 55.75
+    private var currentLon = 37.62
 
-    private static final int PLACE_PICKER_REQUEST = 1;
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
 
-    private WeatherViewModel viewModel;
+        tempTextView = findViewById<TextView>(R.id.tempTextView)
+        windTextView = findViewById<TextView>(R.id.windTextView)
+        pickLocationButton = findViewById<Button>(R.id.pickLocationButton)
+        selectedLocationTextView = findViewById<TextView>(R.id.selectedLocationTextView)
+        progressBar = findViewById<ProgressBar>(R.id.progressBar)
 
-    private TextView tempTextView;
-    private TextView windTextView;
-    private Button pickLocationButton;
-    private TextView selectedLocationTextView;
-    private ProgressBar progressBar;
+        viewModel = ViewModelProvider(this).get<WeatherViewModel>(WeatherViewModel::class.java)
 
-    private double currentLat = 55.75;
-    private double currentLon = 37.62;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        tempTextView = findViewById(R.id.tempTextView);
-        windTextView = findViewById(R.id.windTextView);
-        pickLocationButton = findViewById(R.id.pickLocationButton);
-        selectedLocationTextView = findViewById(R.id.selectedLocationTextView);
-        progressBar = findViewById(R.id.progressBar);
-
-        viewModel = new ViewModelProvider(this).get(WeatherViewModel.class);
-
-        viewModel.getWeatherData().observe(this, weatherData -> {
-            progressBar.setVisibility(View.GONE);
-            if (weatherData != null && weatherData.getCurrentWeather() != null) {
-                double temp = weatherData.getCurrentWeather().getTemperature();
-                double wind = weatherData.getCurrentWeather().getWindspeed();
-                tempTextView.setText(temp + " °C");
-                windTextView.setText("Wind: " + wind + " m/s");
+        viewModel!!.getWeatherData().observe(this, Observer { weatherData: WeatherData? ->
+            progressBar!!.setVisibility(View.GONE)
+            if (weatherData != null && weatherData.currentWeather != null) {
+                val temp = weatherData.currentWeather.temperature
+                val wind = weatherData.currentWeather.windspeed
+                tempTextView!!.setText(temp.toString() + " °C")
+                windTextView!!.setText("Wind: " + wind + " m/s")
             }
-        });
+        })
 
-        viewModel.getErrorMessage().observe(this, error -> {
-            progressBar.setVisibility(View.GONE);
-            Toast.makeText(MainActivity.this, "Error: " + error, Toast.LENGTH_SHORT).show();
-        });
+        viewModel!!.getErrorMessage().observe(this, Observer { error: String? ->
+            progressBar!!.setVisibility(View.GONE)
+            Toast.makeText(this@MainActivity, "Error: " + error, Toast.LENGTH_SHORT).show()
+        })
 
-        pickLocationButton.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, PlacePickerActivity.class);
-            intent.putExtra(PlacePickerActivity.EXTRA_LATITUDE, currentLat);
-            intent.putExtra(PlacePickerActivity.EXTRA_LONGITUDE, currentLon);
-            startActivityForResult(intent, PLACE_PICKER_REQUEST);
-        });
+        pickLocationButton!!.setOnClickListener(View.OnClickListener { v: View? ->
+            val intent = Intent(this@MainActivity, PlacePickerActivity::class.java)
+            intent.putExtra(PlacePickerActivity.EXTRA_LATITUDE, currentLat)
+            intent.putExtra(PlacePickerActivity.EXTRA_LONGITUDE, currentLon)
+            startActivityForResult(intent, PLACE_PICKER_REQUEST)
+        })
 
-        updateLocationText();
+        updateLocationText()
 
-        loadWeather(currentLat, currentLon);
+        loadWeather(currentLat, currentLon)
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PLACE_PICKER_REQUEST) {
             if (resultCode == RESULT_OK && data != null) {
-                double lat = data.getDoubleExtra(PlacePickerActivity.EXTRA_LATITUDE, currentLat);
-                double lon = data.getDoubleExtra(PlacePickerActivity.EXTRA_LONGITUDE, currentLon);
-                currentLat = lat;
-                currentLon = lon;
+                val lat = data.getDoubleExtra(PlacePickerActivity.EXTRA_LATITUDE, currentLat)
+                val lon = data.getDoubleExtra(PlacePickerActivity.EXTRA_LONGITUDE, currentLon)
+                currentLat = lat
+                currentLon = lon
 
-                updateLocationText();
+                updateLocationText()
 
-                loadWeather(lat, lon);
+                loadWeather(lat, lon)
             }
         }
     }
 
-    private void updateLocationText() {
-        String text = String.format("Latitude: %.4f, Longitude: %.4f", currentLat, currentLon);
-        selectedLocationTextView.setText(text);
+    private fun updateLocationText() {
+        val text = String.format("Latitude: %.4f, Longitude: %.4f", currentLat, currentLon)
+        selectedLocationTextView!!.setText(text)
     }
 
-    private void loadWeather(double lat, double lon) {
-        progressBar.setVisibility(View.VISIBLE);
-        viewModel.loadWeather(lat, lon);
+    private fun loadWeather(lat: Double, lon: Double) {
+        progressBar!!.setVisibility(View.VISIBLE)
+        viewModel!!.loadWeather(lat, lon)
+    }
+
+    companion object {
+        private const val PLACE_PICKER_REQUEST = 1
     }
 }

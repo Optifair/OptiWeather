@@ -1,102 +1,100 @@
-package com.example.optiweather;
+package com.example.optiweather
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.MotionEvent;
-import android.widget.Button;
+import android.content.Intent
+import android.os.Bundle
+import android.view.MotionEvent
+import android.view.View
+import android.view.View.OnTouchListener
+import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
+import org.osmdroid.config.Configuration
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
-import androidx.appcompat.app.AppCompatActivity;
+class PlacePickerActivity : AppCompatActivity() {
+    private var mapView: MapView? = null
+    private var selectedMarker: Marker? = null
+    private var confirmButton: Button? = null
 
-import org.osmdroid.config.Configuration;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-public class PlacePickerActivity extends AppCompatActivity {
+        Configuration.getInstance().userAgentValue = packageName
 
-    private MapView mapView;
-    private Marker selectedMarker;
-    private Button confirmButton;
+        setContentView(R.layout.activity_place_picker)
 
-    public static final String EXTRA_LATITUDE = "extra_latitude";
-    public static final String EXTRA_LONGITUDE = "extra_longitude";
+        mapView = findViewById<MapView>(R.id.mapView)
+        confirmButton = findViewById<Button>(R.id.confirm_button)
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        mapView!!.setTileSource(TileSourceFactory.MAPNIK)
+        mapView!!.setMultiTouchControls(true)
+        mapView!!.setBuiltInZoomControls(true)
 
-        Configuration.getInstance().setUserAgentValue(getPackageName());
+        val defaultLat = intent.getDoubleExtra(EXTRA_LATITUDE, 55.75)
+        val defaultLon = intent.getDoubleExtra(EXTRA_LONGITUDE, 37.62)
+        val defaultPoint = GeoPoint(defaultLat, defaultLon)
 
-        setContentView(R.layout.activity_place_picker);
+        mapView!!.controller.setZoom(10.0)
+        mapView!!.controller.setCenter(defaultPoint)
 
-        mapView = findViewById(R.id.mapView);
-        confirmButton = findViewById(R.id.confirm_button);
+        addMarker(defaultPoint)
 
-        mapView.setTileSource(TileSourceFactory.MAPNIK);
-        mapView.setMultiTouchControls(true);
-        mapView.setBuiltInZoomControls(true);
+        val locationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(this), mapView)
+        locationOverlay.enableMyLocation()
+        mapView!!.overlays.add(locationOverlay)
 
-        double defaultLat = getIntent().getDoubleExtra(EXTRA_LATITUDE, 55.75);
-        double defaultLon = getIntent().getDoubleExtra(EXTRA_LONGITUDE, 37.62);
-        GeoPoint defaultPoint = new GeoPoint(defaultLat, defaultLon);
-
-        mapView.getController().setZoom(10.0);
-        mapView.getController().setCenter(defaultPoint);
-
-        addMarker(defaultPoint);
-
-        MyLocationNewOverlay locationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), mapView);
-        locationOverlay.enableMyLocation();
-        mapView.getOverlays().add(locationOverlay);
-
-        mapView.setOnTouchListener((v, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_UP) {
-                GeoPoint point = (GeoPoint) mapView.getProjection().fromPixels(
-                        (int) event.getX(),
-                        (int) event.getY()
-                );
-                addMarker(point);
+        mapView!!.setOnTouchListener { v: View?, event: MotionEvent? ->
+            if (event!!.action == MotionEvent.ACTION_UP) {
+                val point = mapView!!.getProjection().fromPixels(
+                    event.x.toInt(),
+                    event.y.toInt()
+                ) as GeoPoint?
+                addMarker(point)
             }
-            return false;
-        });
-
-        confirmButton.setOnClickListener(v -> {
-            if (selectedMarker != null) {
-                GeoPoint position = selectedMarker.getPosition();
-                Intent resultIntent = new Intent();
-                resultIntent.putExtra(EXTRA_LATITUDE, position.getLatitude());
-                resultIntent.putExtra(EXTRA_LONGITUDE, position.getLongitude());
-                setResult(RESULT_OK, resultIntent);
-                finish();
-            }
-        });
-    }
-
-    private void addMarker(GeoPoint point) {
-        if (selectedMarker != null) {
-            mapView.getOverlays().remove(selectedMarker);
+            false
         }
 
-        selectedMarker = new Marker(mapView);
-        selectedMarker.setPosition(point);
-        selectedMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        selectedMarker.setTitle("Selected location");
-        mapView.getOverlays().add(selectedMarker);
-        mapView.invalidate();
+        confirmButton!!.setOnClickListener(View.OnClickListener { v: View? ->
+            if (selectedMarker != null) {
+                val position = selectedMarker!!.position
+                val resultIntent = Intent()
+                resultIntent.putExtra(EXTRA_LATITUDE, position.latitude)
+                resultIntent.putExtra(EXTRA_LONGITUDE, position.longitude)
+                setResult(RESULT_OK, resultIntent)
+                finish()
+            }
+        })
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mapView.onResume();
+    private fun addMarker(point: GeoPoint?) {
+        if (selectedMarker != null) {
+            mapView!!.overlays.remove(selectedMarker)
+        }
+
+        selectedMarker = Marker(mapView)
+        selectedMarker!!.setPosition(point)
+        selectedMarker!!.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        selectedMarker!!.title = "Selected location"
+        mapView!!.overlays.add(selectedMarker)
+        mapView!!.invalidate()
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mapView.onPause();
+    override fun onResume() {
+        super.onResume()
+        mapView!!.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mapView!!.onPause()
+    }
+
+    companion object {
+        const val EXTRA_LATITUDE: String = "extra_latitude"
+        const val EXTRA_LONGITUDE: String = "extra_longitude"
     }
 }

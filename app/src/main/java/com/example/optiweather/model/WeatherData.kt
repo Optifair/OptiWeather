@@ -1,26 +1,16 @@
-package com.example.optiweather.model;
+package com.example.optiweather.model
 
-import com.google.gson.annotations.SerializedName;
+import com.google.gson.annotations.SerializedName
 
-public class WeatherData {
-
+class WeatherData {
+    @JvmField
     @SerializedName("current_weather")
-    private CurrentWeather currentWeather;
+    val currentWeather: CurrentWeather? = null
 
-    public CurrentWeather getCurrentWeather() {
-        return currentWeather;
-    }
-
-    public static class CurrentWeather {
-        private double temperature;
-        private double windspeed;
-
-        public double getTemperature() {
-            return temperature;
-        }
-
-        public double getWindspeed() {
-            return windspeed;
-        }
+    class CurrentWeather {
+        @JvmField
+        val temperature: Double = 0.0
+        @JvmField
+        val windspeed: Double = 0.0
     }
 }

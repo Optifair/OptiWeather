@@ -1,41 +1,38 @@
-package com.example.optiweather.viewmodel;
+package com.example.optiweather.viewmodel
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.example.optiweather.model.WeatherData
+import com.example.optiweather.repository.WeatherRepository
+import com.example.optiweather.repository.WeatherRepository.WeatherCallback
 
-import com.example.optiweather.model.WeatherData;
-import com.example.optiweather.repository.WeatherRepository;
+class WeatherViewModel : ViewModel() {
+    private val repository: WeatherRepository
+    private val weatherData = MutableLiveData<WeatherData?>()
+    private val errorMessage = MutableLiveData<String?>()
 
-public class WeatherViewModel extends ViewModel {
-
-    private final WeatherRepository repository;
-    private final MutableLiveData<WeatherData> weatherData = new MutableLiveData<>();
-    private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
-
-    public WeatherViewModel() {
-        repository = new WeatherRepository();
+    init {
+        repository = WeatherRepository()
     }
 
-    public LiveData<WeatherData> getWeatherData() {
-        return weatherData;
+    fun getWeatherData(): LiveData<WeatherData?> {
+        return weatherData
     }
 
-    public LiveData<String> getErrorMessage() {
-        return errorMessage;
+    fun getErrorMessage(): LiveData<String?> {
+        return errorMessage
     }
 
-    public void loadWeather(double lat, double lon) {
-        repository.getWeather(lat, lon, new WeatherRepository.WeatherCallback() {
-            @Override
-            public void onSuccess(WeatherData data) {
-                weatherData.postValue(data);
+    fun loadWeather(lat: Double, lon: Double) {
+        repository.getWeather(lat, lon, object : WeatherCallback {
+            override fun onSuccess(data: WeatherData?) {
+                weatherData.postValue(data)
             }
 
-            @Override
-            public void onError(String error) {
-                errorMessage.postValue(error);
+            override fun onError(error: String?) {
+                errorMessage.postValue(error)
             }
-        });
+        })
     }
 }

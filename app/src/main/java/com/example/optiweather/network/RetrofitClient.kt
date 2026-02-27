@@ -1,19 +1,21 @@
-package com.example.optiweather.network;
+package com.example.optiweather.network
 
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
-public class RetrofitClient {
-    private static final String BASE_URL = "https://api.open-meteo.com/";
-    private static Retrofit retrofit = null;
+object RetrofitClient {
+    private const val BASE_URL = "https://api.open-meteo.com/"
+    private var retrofit: Retrofit? = null
 
-    public static WeatherApi getApi() {
-        if (retrofit == null) {
-            retrofit = new Retrofit.Builder()
+    @JvmStatic
+    val api: WeatherApi
+        get() {
+            if (retrofit == null) {
+                retrofit = Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())
-                    .build();
+                    .build()
+            }
+            return retrofit!!.create(WeatherApi::class.java)
         }
-        return retrofit.create(WeatherApi.class);
-    }
 }
