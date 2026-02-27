@@ -1,4 +1,5 @@
 [versions]
+activityCompose = "1.12.4"
 agp = "8.13.2"
 appcompatVersion = "1.6.1"
 constraintlayoutVersion = "2.1.4"
@@ -10,12 +11,16 @@ lifecycleViewmodel = "2.10.0"
 material = "1.13.0"
 activity = "1.12.3"
 constraintlayout = "2.2.1"
+material3 = "1.4.0"
 materialVersion = "1.11.0"
+osmdroidAndroid = "6.1.20"
 retrofit = "3.0.0"
 kotlin = "2.2.0"
 coreKtx = "1.17.0"
+ui = "1.10.4"
 
 [libraries]
+activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
 appcompat-v161 = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
 constraintlayout-v214 = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayoutVersion" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
@@ -30,8 +35,11 @@ material = { group = "com.google.android.material", name = "material", version.r
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 material-v1110 = { module = "com.google.android.material:material", version.ref = "materialVersion" }
+material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+osmdroid-android = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroidAndroid" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
