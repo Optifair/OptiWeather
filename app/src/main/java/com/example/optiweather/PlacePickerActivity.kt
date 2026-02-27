@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
-import android.view.View.OnTouchListener
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import org.osmdroid.config.Configuration
@@ -27,8 +26,8 @@ class PlacePickerActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_place_picker)
 
-        mapView = findViewById<MapView>(R.id.mapView)
-        confirmButton = findViewById<Button>(R.id.confirm_button)
+        mapView = findViewById(R.id.mapView)
+        confirmButton = findViewById(R.id.confirm_button)
 
         mapView!!.setTileSource(TileSourceFactory.MAPNIK)
         mapView!!.setMultiTouchControls(true)
@@ -58,7 +57,7 @@ class PlacePickerActivity : AppCompatActivity() {
             false
         }
 
-        confirmButton!!.setOnClickListener(View.OnClickListener { v: View? ->
+        confirmButton!!.setOnClickListener { v: View? ->
             if (selectedMarker != null) {
                 val position = selectedMarker!!.position
                 val resultIntent = Intent()
@@ -67,7 +66,7 @@ class PlacePickerActivity : AppCompatActivity() {
                 setResult(RESULT_OK, resultIntent)
                 finish()
             }
-        })
+        }
     }
 
     private fun addMarker(point: GeoPoint?) {

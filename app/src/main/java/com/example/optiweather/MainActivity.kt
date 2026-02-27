@@ -11,10 +11,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.optiweather.model.WeatherData
-import com.example.optiweather.viewmodel.WeatherViewModel
+import com.example.optiweather.viewmodel.MainViewModel
 
 class MainActivity : AppCompatActivity() {
-    private var viewModel: WeatherViewModel? = null
+    private var viewModel: MainViewModel? = null
 
     private var tempTextView: TextView? = null
     private var windTextView: TextView? = null
@@ -29,27 +29,27 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        tempTextView = findViewById<TextView>(R.id.tempTextView)
-        windTextView = findViewById<TextView>(R.id.windTextView)
-        pickLocationButton = findViewById<Button>(R.id.pickLocationButton)
-        selectedLocationTextView = findViewById<TextView>(R.id.selectedLocationTextView)
-        progressBar = findViewById<ProgressBar>(R.id.progressBar)
+        tempTextView = findViewById(R.id.tempTextView)
+        windTextView = findViewById(R.id.windTextView)
+        pickLocationButton = findViewById(R.id.pickLocationButton)
+        selectedLocationTextView = findViewById(R.id.selectedLocationTextView)
+        progressBar = findViewById(R.id.progressBar)
 
-        viewModel = ViewModelProvider(this).get<WeatherViewModel>(WeatherViewModel::class.java)
+        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
         viewModel!!.getWeatherData().observe(this, Observer { weatherData: WeatherData? ->
-            progressBar!!.setVisibility(View.GONE)
+            progressBar!!.visibility = View.GONE
             if (weatherData != null && weatherData.currentWeather != null) {
                 val temp = weatherData.currentWeather.temperature
                 val wind = weatherData.currentWeather.windspeed
-                tempTextView!!.setText(temp.toString() + " °C")
-                windTextView!!.setText("Wind: " + wind + " m/s")
+                tempTextView!!.text = "$temp °C"
+                windTextView!!.text = "Wind: $wind m/s"
             }
         })
 
         viewModel!!.getErrorMessage().observe(this, Observer { error: String? ->
-            progressBar!!.setVisibility(View.GONE)
-            Toast.makeText(this@MainActivity, "Error: " + error, Toast.LENGTH_SHORT).show()
+            progressBar!!.visibility = View.GONE
+            Toast.makeText(this@MainActivity, "Error: $error", Toast.LENGTH_SHORT).show()
         })
 
         pickLocationButton!!.setOnClickListener(View.OnClickListener { v: View? ->
@@ -82,11 +82,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateLocationText() {
         val text = String.format("Latitude: %.4f, Longitude: %.4f", currentLat, currentLon)
-        selectedLocationTextView!!.setText(text)
+        selectedLocationTextView!!.text = text
     }
 
     private fun loadWeather(lat: Double, lon: Double) {
-        progressBar!!.setVisibility(View.VISIBLE)
+        progressBar!!.visibility = View.VISIBLE
         viewModel!!.loadWeather(lat, lon)
     }
 

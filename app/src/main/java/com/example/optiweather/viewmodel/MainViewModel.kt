@@ -7,14 +7,10 @@ import com.example.optiweather.model.WeatherData
 import com.example.optiweather.repository.WeatherRepository
 import com.example.optiweather.repository.WeatherRepository.WeatherCallback
 
-class WeatherViewModel : ViewModel() {
-    private val repository: WeatherRepository
+class MainViewModel : ViewModel() {
+    private val repository: WeatherRepository = WeatherRepository()
     private val weatherData = MutableLiveData<WeatherData?>()
     private val errorMessage = MutableLiveData<String?>()
-
-    init {
-        repository = WeatherRepository()
-    }
 
     fun getWeatherData(): LiveData<WeatherData?> {
         return weatherData
@@ -26,8 +22,8 @@ class WeatherViewModel : ViewModel() {
 
     fun loadWeather(lat: Double, lon: Double) {
         repository.getWeather(lat, lon, object : WeatherCallback {
-            override fun onSuccess(data: WeatherData?) {
-                weatherData.postValue(data)
+            override fun onSuccess(weatherData: WeatherData?) {
+                this@MainViewModel.weatherData.postValue(weatherData)
             }
 
             override fun onError(error: String?) {
