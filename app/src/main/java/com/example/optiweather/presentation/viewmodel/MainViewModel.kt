@@ -1,4 +1,4 @@
-package com.example.optiweather.viewmodel
+package com.example.optiweather.presentation.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -7,14 +7,13 @@ import androidx.lifecycle.viewModelScope
 import com.example.optiweather.domain.model.CoordinatesData
 import com.example.optiweather.domain.model.WeatherData
 import com.example.optiweather.domain.usecase.GetWeatherUseCase
-import com.example.optiweather.data.repository.WeatherRepositoryImpl
 import kotlinx.coroutines.launch
 
-class MainViewModel : ViewModel() {
+class MainViewModel(
+    private val getWeatherUseCase: GetWeatherUseCase
+) : ViewModel() {
     private val weatherData = MutableLiveData<WeatherData?>()
     private val errorMessage = MutableLiveData<String?>()
-    private val weatherRepository by lazy { WeatherRepositoryImpl() }
-    private val getWeatherUseCase by lazy { GetWeatherUseCase(weatherRepository) }
 
     fun getWeatherData(): LiveData<WeatherData?> {
         return weatherData

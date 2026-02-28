@@ -9,14 +9,14 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.example.optiweather.R
 import com.example.optiweather.domain.model.CoordinatesData
 import com.example.optiweather.domain.model.WeatherData
-import com.example.optiweather.viewmodel.MainViewModel
+import com.example.optiweather.presentation.viewmodel.MainViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
-    private var viewModel: MainViewModel? = null
+    private val vm by viewModel<MainViewModel>()
 
     private var tempTextView: TextView? = null
     private var windTextView: TextView? = null
@@ -37,9 +37,7 @@ class MainActivity : AppCompatActivity() {
         selectedLocationTextView = findViewById(R.id.selectedLocationTextView)
         progressBar = findViewById(R.id.progressBar)
 
-        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
-
-        viewModel!!.getWeatherData().observe(this, Observer { weatherData: WeatherData? ->
+        vm.getWeatherData().observe(this, Observer { weatherData: WeatherData? ->
             progressBar!!.visibility = View.GONE
             if (weatherData != null) {
                 val temp = weatherData.temperature
@@ -49,7 +47,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        viewModel!!.getErrorMessage().observe(this, Observer { error: String? ->
+        vm.getErrorMessage().observe(this, Observer { error: String? ->
             progressBar!!.visibility = View.GONE
             Toast.makeText(this@MainActivity, "Error: $error", Toast.LENGTH_SHORT).show()
         })
@@ -89,7 +87,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun getWeather(coordinatesData: CoordinatesData) {
         progressBar!!.visibility = View.VISIBLE
-        viewModel!!.getWeather(coordinatesData)
+        vm.getWeather(coordinatesData)
     }
 
     companion object {

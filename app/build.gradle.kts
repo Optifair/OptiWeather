@@ -57,4 +57,7 @@ dependencies {
     implementation(libs.lifecycle.livedata)
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.osmdroid.android)
+
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
 }
