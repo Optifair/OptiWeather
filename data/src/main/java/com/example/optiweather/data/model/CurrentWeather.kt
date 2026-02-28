@@ -1,4 +1,4 @@
-package com.example.optiweather.data.network.model
+package com.example.optiweather.data.model
 
 data class CurrentWeather(
     val temperature: Double = 0.0,

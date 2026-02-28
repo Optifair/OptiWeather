@@ -1,6 +1,6 @@
 package com.example.optiweather.data.network
 
-import com.example.optiweather.data.network.model.Weather
+import com.example.optiweather.data.model.Weather
 import retrofit2.http.GET
 import retrofit2.http.Query
 
