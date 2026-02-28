@@ -4,16 +4,14 @@ import com.example.optiweather.domain.model.CoordinatesData
 import com.example.optiweather.domain.model.WeatherData
 import com.example.optiweather.domain.repository.WeatherRepository
 import com.example.optiweather.data.network.RetrofitClient
-import com.example.optiweather.data.network.WeatherApi
 import retrofit2.HttpException
 import java.io.IOException
 
-class WeatherRepositoryImpl : WeatherRepository {
-    private val api: WeatherApi = RetrofitClient.api
+class WeatherRepositoryImpl(private val retrofitClient: RetrofitClient) : WeatherRepository {
 
     override suspend fun getWeather(coordinatesData: CoordinatesData): Result<WeatherData> {
         return try {
-            val currentWeather = api.getCurrentWeather(
+            val currentWeather = retrofitClient.api.getCurrentWeather(
                 latitude = coordinatesData.latitude,
                 longitude = coordinatesData.longitude,
                 currentWeather = true
