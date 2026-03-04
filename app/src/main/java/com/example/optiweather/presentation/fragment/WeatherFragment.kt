@@ -56,19 +56,24 @@ class WeatherFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        sharedViewModel.weatherData.observe(viewLifecycleOwner, Observer { weatherData ->
-            progressBar.visibility = View.GONE
+        mainViewModel.weatherData.observe(viewLifecycleOwner, Observer { weatherData ->
             if (weatherData != null) {
                 tempTextView.text = "${weatherData.temperature} °C"
                 windTextView.text = "Wind: ${weatherData.windSpeed} m/s"
+            } else {
+                tempTextView.text = "-- °C"
+                windTextView.text = "Wind: -- m/s"
             }
         })
 
-        sharedViewModel.errorMessage.observe(viewLifecycleOwner, Observer { error ->
-            progressBar.visibility = View.GONE
+        mainViewModel.errorMessage.observe(viewLifecycleOwner, Observer { error ->
             if (error != null) {
                 Toast.makeText(requireContext(), "Error: $error", Toast.LENGTH_SHORT).show()
             }
+        })
+
+        mainViewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
+            progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
         })
 
         sharedViewModel.selectedCoordinates.observe(viewLifecycleOwner, Observer { coordinates ->
@@ -83,7 +88,8 @@ class WeatherFragment : Fragment() {
 
     private fun setupListeners() {
         pickLocationButton.setOnClickListener {
-            (requireActivity() as MainActivity).showMapPicker()
+            val coordinates = CoordinatesData(currentLat, currentLon)
+            (requireActivity() as MainActivity).showMapPicker(coordinates)
         }
     }
 
@@ -93,7 +99,6 @@ class WeatherFragment : Fragment() {
     }
 
     private fun loadWeather() {
-        progressBar.visibility = View.VISIBLE
         val coordinates = CoordinatesData(currentLat, currentLon)
         mainViewModel.getWeather(coordinates)
     }
